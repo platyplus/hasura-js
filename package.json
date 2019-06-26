@@ -1,0 +1,49 @@
+{
+  "name": "hasura-js",
+  "version": "0.0.1",
+  "description": "Javascript helpers for Hasura Graphql Engine",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest --config jestconfig.json",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/platyplus/hasura-js.git"
+  },
+  "keywords": [
+    "Hasura",
+    "Javascript"
+  ],
+  "bugs": {
+    "url": "https://github.com/platyplus/hasura-js/issues"
+  },
+  "homepage": "https://github.com/platyplus/hasura-js#readme",
+  "author": "Pierre-Louis Mercereau",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "@types/node": "^12.0.10",
+    "codecov": "^3.5.0",
+    "jest": "^24.8.0",
+    "prettier": "^1.18.2",
+    "ts-jest": "^24.0.2",
+    "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.5.2"
+  },
+  "files": [
+    "lib /**/*"
+  ],
+  "dependencies": {
+    "lodash": "^4.17.11"
+  }
+}
