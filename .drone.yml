@@ -6,7 +6,7 @@ steps:
     commands:
       - npm install
     environment:
-      - NODE_ENV=development
+      - NODE_ENV: development
     when:
       branch: master
   - name: test
