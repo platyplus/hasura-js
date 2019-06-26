@@ -16,3 +16,12 @@ steps:
         from_secret: CODECOV_TOKEN
     when:
       branch: master
+  - name: publish
+    image: plugins/npm
+    settings:
+      username: plmercereau
+      password:
+        from_secret: NPM_PASSWORD
+      email: pilou@platyplus.io
+    when:
+      event: tag

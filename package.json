@@ -1,6 +1,6 @@
 {
-  "name": "hasura-js",
-  "version": "0.0.1",
+  "name": "@platyplus/hasura",
+  "version": "0.0.3",
   "description": "Javascript helpers for Hasura Graphql Engine",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -47,5 +47,8 @@
   ],
   "dependencies": {
     "lodash": "^4.17.11"
+  },
+  "directories": {
+    "lib": "lib"
   }
 }
