@@ -113,7 +113,7 @@ export interface IItemPermissions {
  * @param text
  * @param search
  */
-export const isLike = (text: string, search: string) => {
+export const isLike = (text: string, search: string, caseSentitive = true) => {
   if (typeof search !== 'string' || text === null) {
     return false
   }
@@ -122,7 +122,8 @@ export const isLike = (text: string, search: string) => {
   // Replace % and _ with equivalent regex
   search = search.replace(/%/g, '.*').replace(/_/g, '.')
   // Check matches
-  return RegExp('^' + search + '$', 'gi').test(text)
+  const flags = caseSentitive ? 'g' : 'gi'
+  return RegExp('^' + search + '$', flags).test(text)
 }
 
 const testValue = (
@@ -167,10 +168,10 @@ const testValue = (
       return isLike(fieldValue, environment[variableName])
     case '_nlike':
       return !isLike(fieldValue, environment[variableName])
-    case '_ilike': // TODO
-      return true
-    case '_nilike': // TODO
-      return true
+    case '_ilike':
+      return isLike(fieldValue, environment[variableName], false)
+    case '_nilike':
+      return !isLike(fieldValue, environment[variableName], false)
     case '_similar': // TODO
       return true
     case '_nsimilar': // TODO
