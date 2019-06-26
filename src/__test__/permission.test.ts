@@ -1,4 +1,4 @@
-import { IItemPermissions, isLike, validateInsert } from '../index';
+import { IItemPermissions, isLike, validateInsert } from '../index'
 const permissions: IItemPermissions = {
   select: {
     filter: { _and: [{ id: { _nin: [] } }, { data_type_id: { _gte: 'X-Hasura-User-Id' } }] },
@@ -21,24 +21,24 @@ const permissions: IItemPermissions = {
     },
     columns: ['class_id', 'data_type_id']
   }
-};
+}
 const newObject: any = {
   class_id: '2fwefew',
   data_type_id: '45677',
   encounter_type_concepts: {
     id: '12345'
   }
-};
+}
 const environment: any = {
   'X-Hasura-User-Id': '1234'
-};
+}
 test('insert', () => {
-  expect(validateInsert(newObject, permissions.insert, environment)).toBeTruthy();
-});
+  expect(validateInsert(newObject, permissions.insert, environment)).toBeTruthy()
+})
 
 test('LIKE in javascript', () => {
-  expect(isLike('Pilou', '%lou')).toBeTruthy();
-  expect(isLike('Pile', '%lou')).toBeFalsy();
-  expect(isLike('Pilou', 'Pi%')).toBeTruthy();
-  expect(isLike('abc', 'c')).toBeFalsy();
-});
+  expect(isLike('Pilou', '%lou')).toBeTruthy()
+  expect(isLike('Pile', '%lou')).toBeFalsy()
+  expect(isLike('Pilou', 'Pi%')).toBeTruthy()
+  expect(isLike('abc', 'c')).toBeFalsy()
+})
