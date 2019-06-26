@@ -5,6 +5,8 @@ steps:
     image: node:alpine
     commands:
       - npm install
+    environment:
+      - NODE_ENV=development
     when:
       branch: master
   - name: test
