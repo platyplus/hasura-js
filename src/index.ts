@@ -126,6 +126,10 @@ export const isLike = (text: string, search: string, caseSentitive = true) => {
   return RegExp('^' + search + '$', flags).test(text)
 }
 
+export const isSimilar = (text: string, search: string) => {
+  // TODO Code - the following line is an incorrect workaround
+  return isLike(text, search, false)
+}
 const testValue = (
   value: any,
   currentTest: ITest | IValueTest,
@@ -172,10 +176,10 @@ const testValue = (
       return isLike(fieldValue, environment[variableName], false)
     case '_nilike':
       return !isLike(fieldValue, environment[variableName], false)
-    case '_similar': // TODO
-      return true
-    case '_nsimilar': // TODO
-      return true
+    case '_similar':
+      return isSimilar(fieldValue, environment[variableName])
+    case '_nsimilar':
+      return !isSimilar(fieldValue, environment[variableName])
     case undefined:
       return false
     default:
