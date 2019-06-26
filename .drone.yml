@@ -1,21 +1,11 @@
 kind: pipeline
 name: push-master
 steps:
-  - name: install-dependencies
+  - name: build-test
     image: node:alpine
     commands:
       - npm install
-    when:
-      branch: master
-  - name: test
-    image: node:alpine
-    commands:
       - npm run test
-    when:
-      branch: master
-  - name: build
-    image: node:alpine
-    commands:
       - npm run build
     when:
       branch: master
