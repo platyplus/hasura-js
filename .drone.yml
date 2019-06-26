@@ -19,12 +19,10 @@ steps:
       - npm run build
     when:
       branch: master
-  - name: code-coverage
-    image: node:alpine
-    commands:
-      - npm run report-coverage
-    environment:
-      CODECOV_TOKEN:
-        from_secret: CODECOV_TOKEN
+  - name: coverage
+    image: plugins/codecov
+    settings:
+    token:
+      from_secret: CODECOV_TOKEN
     when:
       branch: master
