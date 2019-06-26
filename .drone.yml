@@ -22,7 +22,7 @@ steps:
   - name: coverage
     image: plugins/codecov
     settings:
-    token:
-      from_secret: CODECOV_TOKEN
+      token:
+        from_secret: CODECOV_TOKEN
     when:
       branch: master
