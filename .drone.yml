@@ -5,8 +5,6 @@ steps:
     image: node:alpine
     commands:
       - npm install
-    # environment:
-    #   NODE_ENV: development
     when:
       branch: master
   - name: test
@@ -19,7 +17,6 @@ steps:
     image: node:alpine
     commands:
       - npm run build
-      - npm run report-coverage
     when:
       branch: master
   - name: code-coverage
