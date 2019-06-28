@@ -2,7 +2,7 @@
 
 ![npm](https://img.shields.io/npm/v/@platyplus/hasura.svg)
 ![Drone (cloud)](https://img.shields.io/drone/build/platyplus/hasura-js.svg)
-![Codecov](https://img.shields.io/codecov/c/github/platyplus/hasura-js.svg)
+[![codecov](https://codecov.io/gh/platyplus/hasura-js/branch/master/graph/badge.svg)](https://codecov.io/gh/platyplus/hasura-js)
 
 ## TO DO
 
