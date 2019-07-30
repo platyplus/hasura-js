@@ -70,7 +70,12 @@ function processExp(expression: IExpression, dataObject: IDataObject) {
     processor = processLitteral
   }
   //   console.log(processor)
-  return processor(expression, dataObject)
+  try {
+    return processor(expression, dataObject)
+  } catch (error) {
+    // example: length(undefined)
+    return false
+  }
 }
 
 export function checkConstraint(constraint: string, dataObject: IDataObject) {
@@ -80,19 +85,4 @@ export function checkConstraint(constraint: string, dataObject: IDataObject) {
   return processExp(expression, dataObject)
 }
 
-// const check = 'length(bidon) > 0 and autre = 12 and enfin < 4'
-// const data = {
-//   autre: 12,
-//   enfin: 3,
-//   bidon: 'dede'
-// }
-// console.log(checkConstraint(check, data))
-
-// check = '(length((username)) >= 10)'
-// data = { username: 'pilou' }
-// console.log(checkConstraint(check, data))
-
 // TODO impossible to 'lexer' the string '::text' -> remove before processing?
-// check = '(length((username)::text) >= 2)'
-// data = { username: 'pilou' }
-// console.log(checkConstraint(check, data))
