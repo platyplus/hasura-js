@@ -1,4 +1,5 @@
-import { IItemPermissions, isLike, validateInsert } from '../index'
+import { IItemPermissions, validateInsert } from '../index'
+
 const permissions: IItemPermissions = {
   select: {
     filter: { _and: [{ id: { _nin: [] } }, { data_type_id: { _gte: 'X-Hasura-User-Id' } }] },
@@ -34,11 +35,4 @@ const environment: any = {
 }
 test('insert', () => {
   expect(validateInsert(newObject, permissions.insert, environment)).toBeTruthy()
-})
-
-test('LIKE in javascript', () => {
-  expect(isLike('Pilou', '%lou')).toBeTruthy()
-  expect(isLike('Pile', '%lou')).toBeFalsy()
-  expect(isLike('Pilou', 'Pi%')).toBeTruthy()
-  expect(isLike('abc', 'c')).toBeFalsy()
 })

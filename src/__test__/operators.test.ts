@@ -1,4 +1,4 @@
-import { isLike, isSimilar } from '../index'
+import { isLike, isSimilar } from '../hasura-filters'
 
 test(`Postgres' LIKE and ILIKE in javascript`, () => {
   expect(isLike('Pilou', '%lou')).toBeTruthy()
