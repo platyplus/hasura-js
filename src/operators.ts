@@ -5,9 +5,6 @@
  * @param search
  */
 export const isLike = (text: string, search: string, caseSentitive = true) => {
-  if (typeof search !== 'string' || text === null) {
-    return false
-  }
   // Remove special chars
   search = search.replace(new RegExp('([\\.\\\\\\+\\*\\?\\[\\^\\]\\$\\(\\)\\{\\}\\=\\!\\<\\>\\|\\:\\-])', 'g'), '\\$1')
   // Replace % and _ with equivalent regex

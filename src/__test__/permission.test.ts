@@ -33,6 +33,9 @@ const newObject: any = {
 const environment: any = {
   'X-Hasura-User-Id': '1234'
 }
+
 test('insert', () => {
   expect(validateInsert(newObject, permissions.insert, environment)).toBeTruthy()
 })
+
+// TODO validateUpdate, validateDelete

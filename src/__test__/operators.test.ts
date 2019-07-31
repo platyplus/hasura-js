@@ -9,8 +9,8 @@ test(`Postgres' LIKE and ILIKE in javascript`, () => {
 })
 
 test(`Postgres' ILIKE in javascript`, () => {
-  expect(isLike('Pilou', '%lou')).toBeTruthy()
-  expect(isLike('Pilou', '%LOU', false)).toBeTruthy()
+  expect(isSimilar('Pilou', '%lou')).toBeTruthy()
+  expect(isSimilar('Pilou', '%LOU')).toBeTruthy()
 })
 
 // TODO uncomment once isSimilar is implemented
