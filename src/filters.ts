@@ -1,4 +1,4 @@
-import { get } from 'lodash' // TODO install only lodash.get, not all lodash
+import get from 'lodash.get'
 
 interface IEqOperator {
   _eq: string

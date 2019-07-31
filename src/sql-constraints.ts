@@ -17,10 +17,12 @@ interface IExpressionProcessorList {
   [key: string]: ExpressionProcessor
 }
 
-// TODO reuse operations from hasura-filters.ts
+// TODO reuse operations from hasura-filters.ts?
 const OPERATIONS: IExpressionProcessorList = {
   and: (exp: IExpression, dataObject: IDataObject) =>
     processExp(exp.left, dataObject) && processExp(exp.right, dataObject),
+  or: (exp: IExpression, dataObject: IDataObject) =>
+    processExp(exp.left, dataObject) || processExp(exp.right, dataObject),
   '>': (exp: IExpression, dataObject: IDataObject) =>
     processExp(exp.left, dataObject) > processExp(exp.right, dataObject),
   '>=': (exp: IExpression, dataObject: IDataObject) =>
@@ -33,9 +35,10 @@ const OPERATIONS: IExpressionProcessorList = {
     processExp(exp.left, dataObject) === processExp(exp.right, dataObject)
 }
 
-// TODO reuse functions from hasura-filters.ts
+// TODO reuse functions from hasura-filters.ts?
 const FUNCTIONS: IExpressionProcessorList = {
-  length: (exp: IExpression, dataObject: IDataObject) => processExp(exp.arguments.value[0], dataObject).length
+  length: (exp: IExpression, dataObject: IDataObject) => processExp(exp.arguments.value[0], dataObject).length,
+  not: (exp: IExpression, dataObject: IDataObject) => !processExp(exp.arguments.value[0], dataObject)
 }
 
 const processLitteral = (exp: IExpression, dataObject: IDataObject) => {
@@ -55,15 +58,17 @@ function processExp(expression: IExpression, dataObject: IDataObject) {
   let processor = processDefault
   if (expression instanceof nodes.Op) {
     // console.log(`Operation ${expression.operation}`)
-    processor = OPERATIONS[expression.operation]
+    const operation = expression.operation.toLowerCase()
+    processor = OPERATIONS[operation]
     if (!processor) {
-      throw new Error(`Unknown operation: ${expression.operation}`)
+      throw new Error(`Unknown operation: ${operation}`)
     }
   } else if (expression instanceof nodes.FunctionValue) {
     // console.log('Function')
-    processor = FUNCTIONS[expression.name]
+    const functionName = expression.name.toLowerCase()
+    processor = FUNCTIONS[functionName]
     if (!processor) {
-      throw new Error(`Unknown function: ${expression.name}`)
+      throw new Error(`Unknown function: ${functionName}`)
     }
   } else if (expression instanceof nodes.LiteralValue) {
     // console.log('Literal')

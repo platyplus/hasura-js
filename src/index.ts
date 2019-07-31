@@ -1,4 +1,4 @@
-import { checkFilter, IFilter } from './hasura-filters'
+import { checkFilter, IFilter } from './filters'
 export { checkFilter }
 
 interface IFilterPermission {
