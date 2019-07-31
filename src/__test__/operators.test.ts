@@ -1,4 +1,4 @@
-import { isLike, isSimilar } from '../filters'
+import { isLike, isSimilar } from '../operators'
 
 test(`Postgres' LIKE and ILIKE in javascript`, () => {
   expect(isLike('Pilou', '%lou')).toBeTruthy()
