@@ -13,27 +13,16 @@ interface IExpression {
 }
 
 type ExpressionProcessor = (exp: IExpression, data: IDataObject) => boolean
-interface IExpressionProcessorList {
-  [key: string]: ExpressionProcessor
-}
 
 // TODO reuse operations from hasura-filters.ts?
-// TODO use the same trick as in the function list to simplify
-const OPERATIONS: IExpressionProcessorList = {
-  and: (exp: IExpression, dataObject: IDataObject) =>
-    processExp(exp.left, dataObject) && processExp(exp.right, dataObject),
-  or: (exp: IExpression, dataObject: IDataObject) =>
-    processExp(exp.left, dataObject) || processExp(exp.right, dataObject),
-  '>': (exp: IExpression, dataObject: IDataObject) =>
-    processExp(exp.left, dataObject) > processExp(exp.right, dataObject),
-  '>=': (exp: IExpression, dataObject: IDataObject) =>
-    processExp(exp.left, dataObject) >= processExp(exp.right, dataObject),
-  '<': (exp: IExpression, dataObject: IDataObject) =>
-    processExp(exp.left, dataObject) < processExp(exp.right, dataObject),
-  '<=': (exp: IExpression, dataObject: IDataObject) =>
-    processExp(exp.left, dataObject) <= processExp(exp.right, dataObject),
-  '=': (exp: IExpression, dataObject: IDataObject) =>
-    processExp(exp.left, dataObject) === processExp(exp.right, dataObject)
+const OPERATIONS: { [key: string]: (left: any, right: any) => boolean } = {
+  and: (left: any, right: any) => left && right,
+  or: (left: boolean, right: boolean) => left || right,
+  '>': (left: boolean, right: boolean) => left > right,
+  '>=': (left: boolean, right: boolean) => left >= right,
+  '<': (left: boolean, right: boolean) => left < right,
+  '<=': (left: boolean, right: boolean) => left <= right,
+  '=': (left: boolean, right: boolean) => left === right
 }
 
 // TODO reuse functions from hasura-filters.ts?
@@ -53,7 +42,7 @@ const FUNCTIONS: { [key: string]: (value: any) => any } = {
  * @param exp
  * @param dataObject
  */
-const processLiteral = (exp: IExpression, dataObject: IDataObject) => dataObject[exp.value]
+const processLiteral: ExpressionProcessor = (exp, dataObject) => dataObject[exp.value]
 
 /** Gets the value in the expression
  * E.g.
@@ -65,40 +54,31 @@ const processLiteral = (exp: IExpression, dataObject: IDataObject) => dataObject
  * @param exp
  * @param dataObject
  */
-const processDefault = (exp: IExpression, dataObject: IDataObject) => exp.value
+const processDefault: ExpressionProcessor = exp => exp.value
 
-function processExp(expression: IExpression, dataObject: IDataObject): any {
-  let processor
+const processExp: ExpressionProcessor = (expression, data) => {
   if (expression instanceof nodes.Op) {
-    // console.log(`Operation ${expression.operation}`)
     const operationName = expression.operation.toLowerCase()
-    processor = OPERATIONS[operationName]
-    if (!processor) {
+    const operation = OPERATIONS[operationName]
+    if (!operation) {
       throw new Error(`Unknown operation: ${operationName}`)
     }
+    return operation(processExp(expression.left, data), processExp(expression.right, data))
   } else if (expression instanceof nodes.FunctionValue) {
-    // console.log('Function')
     const functionName = expression.name.toLowerCase()
     const func = FUNCTIONS[functionName]
     if (!func) {
       throw new Error(`Unknown function: ${functionName}`)
     }
-    processor = (exp: IExpression, data: IDataObject) => func(processExp(exp.arguments.value[0], data))
+    return func(processExp(expression.arguments.value[0], data))
   } else if (expression instanceof nodes.LiteralValue) {
-    processor = processLiteral
+    return processLiteral(expression, data)
   } else {
-    processor = processDefault
-  }
-  //   console.log(processor)
-  try {
-    return processor(expression, dataObject)
-  } catch (error) {
-    // example: length(undefined)
-    return false
+    return processDefault(expression, data)
   }
 }
 
-export function checkConstraint(constraint: string, dataObject: IDataObject) {
+export function validateConstraint(constraint: string, dataObject: IDataObject) {
   const prefix = 'select dummy from dummy where '
   const tokens = lexer.tokenize(prefix + constraint)
   const expression = parser.parse(tokens).where.conditions
