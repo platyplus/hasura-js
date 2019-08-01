@@ -1,5 +1,6 @@
 import get from 'lodash.get'
 import { getHasuraOperator } from './operators'
+import { validateConstraint } from './sql-constraints'
 
 interface IEqOperator {
   _eq: string
@@ -80,47 +81,35 @@ interface IValueFilter {
 }
 export type IFilter = IAndFilter | IOrFilter | INotFilter | IValueFilter
 
-const testValue = (
-  value: any,
-  currentTest: IFilter | IValueFilter,
-  environment: any,
-  initialPath: string = ''
-): boolean => {
-  const cursor = currentTest as any
-  const field = Object.keys(currentTest)[0]
-  if (Object.keys(currentTest).length !== 1) {
-    throw Error(
-      `The permission should contain only one property, ${
-        Object.keys(currentTest).length
-      } found\n Test: ${JSON.stringify(currentTest)}`
-    )
-  }
-  const currentPath = initialPath ? `${initialPath}.${field}` : field
-  const operand = Object.keys(cursor[field])[0]
-  const variableName = cursor[field][operand]
-  const fieldValue = get(value, currentPath)
-  // if (!operand) { // TODO really usefull?
-  //   return false
-  // }
-  const operator = getHasuraOperator(operand)
-  if (operator) {
-    return operator(fieldValue, environment[variableName])
-  } else {
-    return testValue(value, cursor[currentPath], environment, currentPath)
+export const generateSqlConstraints = (expression: any, environment: any): string => {
+  const operand = Object.keys(expression)[0]
+  switch (operand) {
+    case '_and':
+      return `(${(expression as IAndFilter)._and
+        .map(element => generateSqlConstraints(element, environment))
+        .join(' and ')})`
+    case '_or':
+      return `(${(expression as IOrFilter)._or
+        .map(element => generateSqlConstraints(element, environment))
+        .join(' or ')})`
+    case '_not':
+      return `NOT (${generateSqlConstraints((expression as INotFilter)._not, environment)})`
+    default:
+      const subExpression = expression[operand]
+      const hasuraOperand = getHasuraOperator(operand)
+      if (hasuraOperand) {
+        let environmentValue = get(environment, subExpression)
+        if (typeof environmentValue === 'string') {
+          environmentValue = `"${environmentValue}"`
+        }
+        return ` ${hasuraOperand} ${environmentValue}`
+      } else if (getHasuraOperator(Object.keys(subExpression)[0])) {
+        return `${operand}${generateSqlConstraints(subExpression, environment)}`
+      } else {
+        return `${operand}.${generateSqlConstraints(subExpression, environment)}`
+      }
   }
 }
 
-export const validateFilter = (value: any, checkTest: IFilter, environment: any): boolean => {
-  const test = checkTest as any
-  const operand = Object.keys(test)[0]
-  switch (operand) {
-    case '_and':
-      return test._and.every((subTest: IFilter) => validateFilter(value, subTest, environment))
-    case '_or':
-      return test._and.some((subTest: IFilter) => validateFilter(value, subTest, environment))
-    case '_not':
-      return !validateFilter(value, test._not, environment)
-    default:
-      return testValue(value, test, environment)
-  }
-}
+export const validateFilter = (value: any, expression: any, environment: any): boolean =>
+  validateConstraint(generateSqlConstraints(expression, environment), value)

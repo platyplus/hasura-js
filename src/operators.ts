@@ -20,7 +20,7 @@ export const isSimilar = (text: string, search: string) => {
   return isLike(text, search, false)
 }
 
-const HASURA_OPERATORS: { [key: string]: string } = {
+export const HASURA_OPERATORS: { [key: string]: string } = {
   _eq: '=',
   _ne: '!=',
   _in: 'in',
@@ -67,7 +67,7 @@ export const getOperator = (operand: string) => OPERATORS[operand]
  * // TODO document
  * @param operand
  */
-export const getHasuraOperator = (operand: string) => getOperator(HASURA_OPERATORS[operand])
+export const getHasuraOperator = (operand: string) => HASURA_OPERATORS[operand]
 
 /**
  * // TODO test and document

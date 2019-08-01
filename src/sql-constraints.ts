@@ -1,3 +1,4 @@
+import get from 'lodash.get'
 import { lexer, nodes, parser } from 'sql-parser'
 import { getOperator } from './operators'
 // TODO work on types
@@ -32,7 +33,7 @@ const FUNCTIONS: { [key: string]: (value: any) => any } = {
  * @param exp
  * @param dataObject
  */
-const processLiteral: ExpressionProcessor = (exp, dataObject) => dataObject[exp.value]
+const processLiteral: ExpressionProcessor = (exp, dataObject) => get(dataObject, exp.value)
 
 /** Gets the value in the expression
  * E.g.

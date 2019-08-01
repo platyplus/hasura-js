@@ -1,3 +1,4 @@
+import { generateSqlConstraints } from '../filters'
 import { IItemPermissions, validateInsert } from '../index'
 
 const permissions: IItemPermissions = {
@@ -38,4 +39,17 @@ test('insert', () => {
   expect(validateInsert(newObject, permissions.insert, environment)).toBeTruthy()
 })
 
+test('generateSqlConstraints', () => {
+  const check = {
+    _and: [
+      { encounter_type_concepts: { id: { _ne: 'X-Hasura-User-Id' } } },
+      {
+        _or: [{ data_type_id: { _gte: 'X-Hasura-User-Id' } }, { another_id: { _lte: 'X-Hasura-User-Id' } }]
+      }
+    ]
+  }
+  expect(generateSqlConstraints(check, environment)).toEqual(
+    '(encounter_type_concepts.id != "1234" and (data_type_id >= "1234" or another_id <= "1234"))'
+  )
+})
 // TODO validateUpdate, validateDelete
