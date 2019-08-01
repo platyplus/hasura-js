@@ -15,14 +15,14 @@ interface IExpression {
 type ExpressionProcessor = (exp: IExpression, data: IDataObject) => boolean
 
 // TODO reuse operations from hasura-filters.ts?
-const OPERATIONS: { [key: string]: (left: any, right: any) => boolean } = {
-  and: (left: any, right: any) => left && right,
-  or: (left: boolean, right: boolean) => left || right,
-  '>': (left: boolean, right: boolean) => left > right,
-  '>=': (left: boolean, right: boolean) => left >= right,
-  '<': (left: boolean, right: boolean) => left < right,
-  '<=': (left: boolean, right: boolean) => left <= right,
-  '=': (left: boolean, right: boolean) => left === right
+const OPERATIONS: { [key: string]: (left: any, right: any) => any } = {
+  and: (left, right) => left && right,
+  or: (left, right) => left || right,
+  '>': (left, right) => left > right,
+  '>=': (left, right) => left >= right,
+  '<': (left, right) => left < right,
+  '<=': (left, right) => left <= right,
+  '=': (left, right) => left === right
 }
 
 // TODO reuse functions from hasura-filters.ts?
