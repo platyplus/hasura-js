@@ -7,9 +7,9 @@ test(`Test =`, () => {
   expect(checkConstraint(check, { bidon: 3 })).toBeTruthy()
   expect(checkConstraint(check, { bidon: 4 })).toBeFalsy()
   expect(checkConstraint(check, {})).toBeFalsy()
-  expect(checkConstraint(check, { bidon: 'text' })).toBeFalsy()
-  const strCheck = 'bidon = "text"'
-  expect(checkConstraint(strCheck, { bidon: 'text' })).toBeTruthy()
+  expect(checkConstraint(check, { bidon: 'text A' })).toBeFalsy()
+  const strCheck = 'bidon = "text B"'
+  expect(checkConstraint(strCheck, { bidon: 'text B' })).toBeTruthy()
   expect(checkConstraint(strCheck, { bidon: 1 })).toBeFalsy()
 })
 
@@ -19,7 +19,7 @@ test(`Test >`, () => {
   expect(checkConstraint(check, { bidon: 3 })).toBeFalsy()
   expect(checkConstraint(check, { bidon: 2 })).toBeFalsy()
   expect(checkConstraint(check, {})).toBeFalsy()
-  expect(checkConstraint(check, { bidon: 'text' })).toBeFalsy()
+  expect(checkConstraint(check, { bidon: 'text C' })).toBeFalsy()
   // TODO compare strings and decimals
 })
 
@@ -29,7 +29,7 @@ test(`Test >=`, () => {
   expect(checkConstraint(check, { bidon: 3 })).toBeTruthy()
   expect(checkConstraint(check, { bidon: 2 })).toBeFalsy()
   expect(checkConstraint(check, {})).toBeFalsy()
-  expect(checkConstraint(check, { bidon: 'text' })).toBeFalsy()
+  expect(checkConstraint(check, { bidon: 'text D' })).toBeFalsy()
   // TODO compare strings and decimals
 })
 
@@ -39,7 +39,7 @@ test(`Test <`, () => {
   expect(checkConstraint(check, { bidon: 3 })).toBeFalsy()
   expect(checkConstraint(check, { bidon: 4 })).toBeFalsy()
   expect(checkConstraint(check, {})).toBeFalsy()
-  expect(checkConstraint(check, { bidon: 'text' })).toBeFalsy()
+  expect(checkConstraint(check, { bidon: 'text E' })).toBeFalsy()
   // TODO compare strings and decimals
 })
 
@@ -49,14 +49,14 @@ test(`Test <=`, () => {
   expect(checkConstraint(check, { bidon: 3 })).toBeTruthy()
   expect(checkConstraint(check, { bidon: 4 })).toBeFalsy()
   expect(checkConstraint(check, {})).toBeFalsy()
-  expect(checkConstraint(check, { bidon: 'text' })).toBeFalsy()
+  expect(checkConstraint(check, { bidon: 'text F' })).toBeFalsy()
   // TODO compare strings and decimals
 })
 
 test(`Test length`, () => {
   const check = 'length(bidon) = 3'
-  expect(checkConstraint(check, { bidon: 'tex' })).toBeTruthy()
-  expect(checkConstraint(check, { bidon: 'text' })).toBeFalsy()
+  expect(checkConstraint(check, { bidon: 'abc' })).toBeTruthy()
+  expect(checkConstraint(check, { bidon: 'text G' })).toBeFalsy()
   expect(checkConstraint(check, { bidon: '' })).toBeFalsy()
   expect(checkConstraint(check, {})).toBeFalsy()
   expect(checkConstraint(check, { bidon: null })).toBeFalsy()
@@ -105,7 +105,7 @@ test(`Test OR`, () => {
   expect(checkConstraint(check, { bidon: 1 })).toBeTruthy()
   expect(checkConstraint(check, { bidon: 2 })).toBeTruthy()
   expect(checkConstraint(check, { bidon: 3 })).toBeFalsy()
-  expect(checkConstraint(check, { bidon: 'text' })).toBeFalsy()
+  expect(checkConstraint(check, { bidon: 'text H' })).toBeFalsy()
   expect(checkConstraint(check, { bidon: '' })).toBeFalsy()
   expect(checkConstraint(check, {})).toBeFalsy()
   expect(checkConstraint(check, { bidon: null })).toBeFalsy()
@@ -118,7 +118,7 @@ test(`Test NOT`, () => {
   const check = 'not(bidon = 1)'
   expect(checkConstraint(check, { bidon: 2 })).toBeTruthy()
   expect(checkConstraint(check, { bidon: 1 })).toBeFalsy()
-  expect(checkConstraint(check, { bidon: 'text' })).toBeTruthy()
+  expect(checkConstraint(check, { bidon: 'text I' })).toBeTruthy()
   expect(checkConstraint(check, { bidon: '' })).toBeTruthy()
   expect(checkConstraint(check, {})).toBeTruthy()
   expect(checkConstraint(check, { bidon: null })).toBeTruthy()

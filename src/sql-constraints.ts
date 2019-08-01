@@ -18,6 +18,7 @@ interface IExpressionProcessorList {
 }
 
 // TODO reuse operations from hasura-filters.ts?
+// TODO use the same trick as in the function list to simplify
 const OPERATIONS: IExpressionProcessorList = {
   and: (exp: IExpression, dataObject: IDataObject) =>
     processExp(exp.left, dataObject) && processExp(exp.right, dataObject),
@@ -36,43 +37,57 @@ const OPERATIONS: IExpressionProcessorList = {
 }
 
 // TODO reuse functions from hasura-filters.ts?
-const FUNCTIONS: IExpressionProcessorList = {
-  length: (exp: IExpression, dataObject: IDataObject) => processExp(exp.arguments.value[0], dataObject).length,
-  not: (exp: IExpression, dataObject: IDataObject) => !processExp(exp.arguments.value[0], dataObject)
+const FUNCTIONS: { [key: string]: (value: any) => any } = {
+  length: (value: string) => value.length,
+  not: (value: boolean) => !value
 }
 
-const processLitteral = (exp: IExpression, dataObject: IDataObject) => {
-  if (typeof exp.value === 'string') {
-    // console.log(`String: ${exp.value}`)
-    return dataObject[exp.value]
-  }
-  return exp.value
-}
+/** Gets the value of the literal in the data object.
+ * E.g.
+ * exp = {
+ *  value: 'key'
+ * }
+ * dataObject = { key: 'value' }
+ * Will return 'value'
+ *
+ * @param exp
+ * @param dataObject
+ */
+const processLiteral = (exp: IExpression, dataObject: IDataObject) => dataObject[exp.value]
 
-// TODO should never be used
-const processDefault = (exp: IExpression, dataObject: IDataObject) => {
-  return exp.value
-}
+/** Gets the value in the expression
+ * E.g.
+ * exp = {
+ *  value: 'a text'
+ * }
+ * Will return 'a text'
+ *
+ * @param exp
+ * @param dataObject
+ */
+const processDefault = (exp: IExpression, dataObject: IDataObject) => exp.value
 
-function processExp(expression: IExpression, dataObject: IDataObject) {
-  let processor = processDefault
+function processExp(expression: IExpression, dataObject: IDataObject): any {
+  let processor
   if (expression instanceof nodes.Op) {
     // console.log(`Operation ${expression.operation}`)
-    const operation = expression.operation.toLowerCase()
-    processor = OPERATIONS[operation]
+    const operationName = expression.operation.toLowerCase()
+    processor = OPERATIONS[operationName]
     if (!processor) {
-      throw new Error(`Unknown operation: ${operation}`)
+      throw new Error(`Unknown operation: ${operationName}`)
     }
   } else if (expression instanceof nodes.FunctionValue) {
     // console.log('Function')
     const functionName = expression.name.toLowerCase()
-    processor = FUNCTIONS[functionName]
-    if (!processor) {
+    const func = FUNCTIONS[functionName]
+    if (!func) {
       throw new Error(`Unknown function: ${functionName}`)
     }
+    processor = (exp: IExpression, data: IDataObject) => func(processExp(exp.arguments.value[0], data))
   } else if (expression instanceof nodes.LiteralValue) {
-    // console.log('Literal')
-    processor = processLitteral
+    processor = processLiteral
+  } else {
+    processor = processDefault
   }
   //   console.log(processor)
   try {
