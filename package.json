@@ -1,6 +1,6 @@
 {
   "name": "@platyplus/hasura",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "Javascript helpers for Hasura Graphql Engine",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
