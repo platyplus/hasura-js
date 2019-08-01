@@ -1,5 +1,5 @@
 import get from 'lodash.get'
-import { isLike, isSimilar } from './operators'
+import { getHasuraOperator } from './operators'
 
 interface IEqOperator {
   _eq: string
@@ -99,54 +99,27 @@ const testValue = (
   const operand = Object.keys(cursor[field])[0]
   const variableName = cursor[field][operand]
   const fieldValue = get(value, currentPath)
-  switch (operand) {
-    case '_eq':
-      return environment[variableName] === fieldValue
-    case '_ne':
-      return environment[variableName] !== fieldValue
-    case '_in':
-      return variableName.map((item: string) => environment[item]).includes(fieldValue)
-    case '_nin':
-      return !variableName.map((item: string) => environment[item]).includes(fieldValue)
-    case '_gt':
-      return fieldValue > environment[variableName]
-    case '_lt':
-      return fieldValue < environment[variableName]
-    case '_gte':
-      return fieldValue >= environment[variableName]
-    case '_lte':
-      return fieldValue <= environment[variableName]
-    case '_is_null':
-      return !Boolean(fieldValue)
-    case '_like':
-      return isLike(fieldValue, environment[variableName])
-    case '_nlike':
-      return !isLike(fieldValue, environment[variableName])
-    case '_ilike':
-      return isLike(fieldValue, environment[variableName], false)
-    case '_nilike':
-      return !isLike(fieldValue, environment[variableName], false)
-    case '_similar':
-      return isSimilar(fieldValue, environment[variableName])
-    case '_nsimilar':
-      return !isSimilar(fieldValue, environment[variableName])
-    case undefined:
-      return false
-    default:
-      return testValue(value, cursor[currentPath], environment, currentPath)
+  // if (!operand) { // TODO really usefull?
+  //   return false
+  // }
+  const operator = getHasuraOperator(operand)
+  if (operator) {
+    return operator(fieldValue, environment[variableName])
+  } else {
+    return testValue(value, cursor[currentPath], environment, currentPath)
   }
 }
 
-export const checkFilter = (value: any, checkTest: IFilter, environment: any): boolean => {
+export const validateFilter = (value: any, checkTest: IFilter, environment: any): boolean => {
   const test = checkTest as any
   const operand = Object.keys(test)[0]
   switch (operand) {
     case '_and':
-      return test._and.every((subTest: IFilter) => checkFilter(value, subTest, environment))
+      return test._and.every((subTest: IFilter) => validateFilter(value, subTest, environment))
     case '_or':
-      return test._and.some((subTest: IFilter) => checkFilter(value, subTest, environment))
+      return test._and.some((subTest: IFilter) => validateFilter(value, subTest, environment))
     case '_not':
-      return !checkFilter(value, test._not, environment)
+      return !validateFilter(value, test._not, environment)
     default:
       return testValue(value, test, environment)
   }

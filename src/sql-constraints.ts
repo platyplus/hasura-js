@@ -1,4 +1,5 @@
 import { lexer, nodes, parser } from 'sql-parser'
+import { getOperator } from './operators'
 // TODO work on types
 interface IDataObject {
   [key: string]: any
@@ -13,17 +14,6 @@ interface IExpression {
 }
 
 type ExpressionProcessor = (exp: IExpression, data: IDataObject) => boolean
-
-// TODO reuse operations from hasura-filters.ts?
-const OPERATIONS: { [key: string]: (left: any, right: any) => any } = {
-  and: (left, right) => left && right,
-  or: (left, right) => left || right,
-  '>': (left, right) => left > right,
-  '>=': (left, right) => left >= right,
-  '<': (left, right) => left < right,
-  '<=': (left, right) => left <= right,
-  '=': (left, right) => left === right
-}
 
 // TODO reuse functions from hasura-filters.ts?
 const FUNCTIONS: { [key: string]: (value: any) => any } = {
@@ -59,7 +49,7 @@ const processDefault: ExpressionProcessor = exp => exp.value
 const processExp: ExpressionProcessor = (expression, data) => {
   if (expression instanceof nodes.Op) {
     const operationName = expression.operation.toLowerCase()
-    const operation = OPERATIONS[operationName]
+    const operation = getOperator(operationName)
     if (!operation) {
       throw new Error(`Unknown operation: ${operationName}`)
     }
@@ -70,7 +60,13 @@ const processExp: ExpressionProcessor = (expression, data) => {
     if (!func) {
       throw new Error(`Unknown function: ${functionName}`)
     }
-    return func(processExp(expression.arguments.value[0], data))
+    const value = processExp(expression.arguments.value[0], data)
+    if (value === undefined || value === null) {
+      // TODO throw error instead?
+      return false
+    } else {
+      return func(value)
+    }
   } else if (expression instanceof nodes.LiteralValue) {
     return processLiteral(expression, data)
   } else {

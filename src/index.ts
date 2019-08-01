@@ -1,5 +1,5 @@
-import { checkFilter, IFilter } from './filters'
-export { checkFilter }
+import { IFilter, validateFilter } from './filters'
+export { validateFilter }
 
 interface IFilterPermission {
   filter: IFilter
@@ -30,13 +30,13 @@ export interface IItemPermissions {
 }
 
 export const validateInsert = (value: any, permission: IInsertPermission, environment: any): boolean => {
-  return checkFilter(value, permission.check, environment)
+  return validateFilter(value, permission.check, environment)
 }
 
 export const validateUpdate = (value: any, permission: IUpdatePermission, environment: any): boolean => {
-  return checkFilter(value, permission.filter, environment)
+  return validateFilter(value, permission.filter, environment)
 }
 
 export const validateDelete = (value: any, permission: IDeletePermission, environment: any): boolean => {
-  return checkFilter(value, permission.filter, environment)
+  return validateFilter(value, permission.filter, environment)
 }

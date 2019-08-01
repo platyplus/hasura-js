@@ -13,6 +13,7 @@ test(`Postgres' ILIKE in javascript`, () => {
   expect(isSimilar('Pilou', '%LOU')).toBeTruthy()
 })
 
+// TODO test all the other operators
 // TODO uncomment once isSimilar is implemented
 /*
 test(`Postgres' SIMIlAR TO in javascript`, () => {
