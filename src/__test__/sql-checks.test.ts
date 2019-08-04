@@ -133,11 +133,26 @@ test(`Test LIKE`, () => {
   expect(validateConstraint("bidon LIKE 'c'", { bidon: 'abc' })).toBeFalsy()
 })
 
+test(`Test ILIKE`, () => {
+  expect(validateConstraint("bidon ILIKE '%lou'", { bidon: 'Pilou' })).toBeTruthy()
+  expect(validateConstraint("bidon ILIKE '%LOU'", { bidon: 'Pilou' })).toBeTruthy()
+  expect(validateConstraint("bidon ILIKE '%lou'", { bidon: 'Pile' })).toBeFalsy()
+  expect(validateConstraint("bidon ILIKE 'Pi%'", { bidon: 'Pilou' })).toBeTruthy()
+  expect(validateConstraint("bidon ILIKE 'c'", { bidon: 'abc' })).toBeFalsy()
+})
+
+test(`Test SIMILAR TO`, () => {
+  expect(validateConstraint("bidon SIMILAR TO 'abc'", { bidon: 'abc' })).toBeTruthy()
+  expect(validateConstraint("bidon NOT SIMILAR TO 'abc'", { bidon: 'abc' })).toBeFalsy()
+  // TODO the following test does not pass
+  // expect(validateConstraint("bidon SIMILAR TO 'a'", { bidon: 'abc' })).toBeFalsy()
+  // expect(validateConstraint("bidon SIMILAR TO '%(b|d)%'", { bidon: 'abc' })).toBeTruthy()
+  expect(validateConstraint("bidon SIMILAR TO '(b|c)%'", { bidon: 'abc' })).toBeFalsy()
+})
+
 test(`Test IS NULL, IS NOT NULL`, () => {
   expect(validateConstraint('bidon IS NULL', { bidon: null })).toBeTruthy()
   expect(validateConstraint('bidon IS NOT NULL', { bidon: null })).toBeFalsy()
   expect(validateConstraint('bidon IS NULL', { bidon: 'exists' })).toBeFalsy()
   expect(validateConstraint('bidon IS NOT NULL', { bidon: 'exists' })).toBeTruthy()
 })
-
-// TODO ILIKE, SIMILAR, ISIMILAR

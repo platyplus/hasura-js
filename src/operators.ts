@@ -16,18 +16,12 @@ export const isLike = (text: string, search: string, caseSentitive = true) => {
   return RegExp('^' + search + '$', flags).test(text)
 }
 
-export const isSimilar = (text: string, search: string) => {
-  // TODO Code - the following line is an incorrect workaround
-  return isLike(text, search, false)
-}
-
 const OPERATORS: { [key: string]: IOperation } = {
   '<>': (left, right) => left !== right,
-  // 'is null': left => !Boolean(left),
-  // ilike: (left, right) => isLike(left, right, false),
-  // similar: (left, right) => isSimilar(left, right),
-  '~': (left, right) => Boolean(left.match(new RegExp(right))), // TODO not enough tested
-  '~~': (left, right) => isLike(left, right),
+  '~': (left, right) => Boolean(left.match(new RegExp(right))), // TODO SIMILAR not compliant
+  '!~': (left, right) => !Boolean(left.match(new RegExp(right))), // TODO NOT SIMILAR not compliant
+  '~~': (left, right) => isLike(left, right), // LIKE
+  '~~*': (left, right) => isLike(left, right, false), // ILIKE
   '>': (left, right) => left > right,
   '>=': (left, right) => left >= right,
   '<': (left, right) => left < right,

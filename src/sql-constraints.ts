@@ -12,7 +12,10 @@ interface IExpressionSelector {
 
 const functionProcessors: IExpressionSelector = {
   length: value => value.length,
-  pg_catalog: { similar_escape: value => value } // TODO to be tested
+  pg_catalog: {
+    similar_escape: value => value // TODO to be implemented
+    // http://www.leadum.com/downloads/dbscribe/samples/postgresql/web_modern/function/main/1868368978.html
+  }
 }
 
 const constantValueProcessors: IExpressionSelector = {
