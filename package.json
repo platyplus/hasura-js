@@ -47,7 +47,7 @@
   ],
   "dependencies": {
     "lodash.get": "^4.4.2",
-    "sql-parser": "^0.5.0"
+    "pg-query-native": "^1.2.0"
   },
   "directories": {
     "lib": "lib"

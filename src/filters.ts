@@ -1,5 +1,4 @@
 import get from 'lodash.get'
-import { getHasuraOperator } from './operators'
 import { validateConstraint } from './sql-constraints'
 
 interface IEqOperator {
@@ -81,29 +80,55 @@ interface IValueFilter {
 }
 export type IFilter = IAndFilter | IOrFilter | INotFilter | IValueFilter
 
+const HASURA_OPERATORS: { [key: string]: string } = {
+  _eq: '=',
+  _ne: '!=',
+  _in: 'IN',
+  _nin: 'NOT IN',
+  _gt: '>',
+  _lt: '<',
+  _gte: '>=',
+  _lte: '<=',
+  _is_null: 'IS NULL',
+  _like: 'LIKE',
+  _nlike: 'NOT LIKE',
+  _ilike: 'ILIKE',
+  _nilike: 'NOT ILIKE',
+  _similar: 'SIMILAR TO',
+  _nsimilar: 'NOT SIMILAR TO'
+}
+
+// TODO: revoir, en particulier les différences entre colonnes, string, integer...
+// + les comparateurs Hasura _c*
 export const generateSqlConstraints = (expression: any, environment: any): string => {
   const operand = Object.keys(expression)[0]
   switch (operand) {
     case '_and':
       return `(${(expression as IAndFilter)._and
         .map(element => generateSqlConstraints(element, environment))
-        .join(' and ')})`
+        .join(' AND ')})`
     case '_or':
       return `(${(expression as IOrFilter)._or
         .map(element => generateSqlConstraints(element, environment))
-        .join(' or ')})`
+        .join(' OR ')})`
     case '_not':
       return `NOT (${generateSqlConstraints((expression as INotFilter)._not, environment)})`
     default:
       const subExpression = expression[operand]
-      const hasuraOperand = getHasuraOperator(operand)
+      const hasuraOperand = HASURA_OPERATORS[operand]
       if (hasuraOperand) {
         let environmentValue = get(environment, subExpression)
+        // TODO ugly. Replace with JSON.parse?
         if (typeof environmentValue === 'string') {
-          environmentValue = `"${environmentValue}"`
+          environmentValue = `'${environmentValue}'`
+        } else if (Array.isArray(environmentValue)) {
+          environmentValue =
+            '(' +
+            environmentValue.map(element => (typeof element === 'string' ? `'${element}'` : element)).join(', ') +
+            ')'
         }
         return ` ${hasuraOperand} ${environmentValue}`
-      } else if (getHasuraOperator(Object.keys(subExpression)[0])) {
+      } else if (HASURA_OPERATORS[Object.keys(subExpression)[0]]) {
         return `${operand}${generateSqlConstraints(subExpression, environment)}`
       } else {
         return `${operand}.${generateSqlConstraints(subExpression, environment)}`
@@ -111,5 +136,6 @@ export const generateSqlConstraints = (expression: any, environment: any): strin
   }
 }
 
-export const validateFilter = (value: any, expression: any, environment: any): boolean =>
-  validateConstraint(generateSqlConstraints(expression, environment), value)
+export const validateFilter = (value: any, expression: any, environment: any): boolean => {
+  return validateConstraint(generateSqlConstraints(expression, environment), value)
+}

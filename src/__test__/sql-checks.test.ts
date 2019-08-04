@@ -6,7 +6,7 @@ test(`Test =`, () => {
   expect(validateConstraint(check, { bidon: 4 })).toBeFalsy()
   expect(validateConstraint(check, {})).toBeFalsy()
   expect(validateConstraint(check, { bidon: 'text A' })).toBeFalsy()
-  const strCheck = 'bidon = "text B"'
+  const strCheck = "bidon = 'text B'"
   expect(validateConstraint(strCheck, { bidon: 'text B' })).toBeTruthy()
   expect(validateConstraint(strCheck, { bidon: 1 })).toBeFalsy()
 })
@@ -63,7 +63,7 @@ test(`Test length`, () => {
 
 test(`Test AND`, () => {
   // TODO break down into separate tests
-  const check = 'length(bidon) > 0 and autre = 12 and enfin < 4'
+  const check = 'length(bidon) > 0 AND autre = 12 AND enfin < 4'
   // all conditions ok
   expect(
     validateConstraint(check, {
@@ -113,7 +113,7 @@ test(`Test OR`, () => {
 })
 
 test(`Test NOT`, () => {
-  const check = 'not(bidon = 1)'
+  const check = 'NOT(bidon = 1)'
   expect(validateConstraint(check, { bidon: 2 })).toBeTruthy()
   expect(validateConstraint(check, { bidon: 1 })).toBeFalsy()
   expect(validateConstraint(check, { bidon: 'text I' })).toBeTruthy()
@@ -124,3 +124,20 @@ test(`Test NOT`, () => {
   expect(validateConstraint(capsCheck, { bidon: 2 })).toBeTruthy()
   expect(validateConstraint(capsCheck, { bidon: 1 })).toBeFalsy()
 })
+
+test(`Test LIKE`, () => {
+  expect(validateConstraint("bidon LIKE '%lou'", { bidon: 'Pilou' })).toBeTruthy()
+  expect(validateConstraint("bidon LIKE '%LOU'", { bidon: 'Pilou' })).toBeFalsy()
+  expect(validateConstraint("bidon LIKE '%lou'", { bidon: 'Pile' })).toBeFalsy()
+  expect(validateConstraint("bidon LIKE 'Pi%'", { bidon: 'Pilou' })).toBeTruthy()
+  expect(validateConstraint("bidon LIKE 'c'", { bidon: 'abc' })).toBeFalsy()
+})
+
+test(`Test IS NULL, IS NOT NULL`, () => {
+  expect(validateConstraint('bidon IS NULL', { bidon: null })).toBeTruthy()
+  expect(validateConstraint('bidon IS NOT NULL', { bidon: null })).toBeFalsy()
+  expect(validateConstraint('bidon IS NULL', { bidon: 'exists' })).toBeFalsy()
+  expect(validateConstraint('bidon IS NOT NULL', { bidon: 'exists' })).toBeTruthy()
+})
+
+// TODO ILIKE, SIMILAR, ISIMILAR
