@@ -2,7 +2,7 @@ kind: pipeline
 name: push-master
 steps:
   - name: build-test
-    image: node:alpine
+    image: node
     commands:
       - npm install
       - npm run test
